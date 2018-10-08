@@ -2,6 +2,7 @@ package com.exemple.furlan.apptruco.Activity;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 import android.Manifest;
@@ -26,6 +27,7 @@ import com.exemple.furlan.apptruco.Model.Usuarios;
 import com.exemple.furlan.apptruco.R;
 import com.exemple.furlan.apptruco.Util.Util_Img;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
@@ -34,17 +36,20 @@ import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
 import com.google.firebase.auth.FirebaseAuthUserCollisionException;
 import com.google.firebase.auth.FirebaseAuthWeakPasswordException;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.UserProfileChangeRequest;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 
 public class RegisterActivity extends Activity {
     final int MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE = 99;
     private ImageButton imbUploadImagem;
-    String realPath;
+    private String realPath;
+    private Uri uriFromPath;
 
     private EditText edtNome;
     private EditText edtSobrenome;
@@ -69,8 +74,6 @@ public class RegisterActivity extends Activity {
         edtConfirmaSennha = (EditText) findViewById(R.id.edtConfirmaSenhaRegistro);
         edtEmail = (EditText) findViewById(R.id.edtEmailRegistro);
         btnGravar = (Button) findViewById(R.id.btnGravarUsuario);
-
-        mStorageRef = FirebaseStorage.getInstance().getReference();
 
         btnGravar.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -103,22 +106,23 @@ public class RegisterActivity extends Activity {
 
                     String indentificadorUsuario = Base64Custom.codificarBase64(usuarios.getEmail());
 
-                    Uri file = Uri.fromFile(new File(realPath));
-
-                    String nameArq[] = file.toString().split("/");
-                    final String nomeFile = nameArq[nameArq.length - 1].replace(".", "").replace("jpg","");
-
-                    /*StorageReference photoRef = mStorageRef.child("imageUser/"+nomeFile);
-
-                    photoRef.putFile(file)
-                            .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                                @Override
-                                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                                    usuarios.setPhotoPath(taskSnapshot.getDownloadUrl().toString());
-                                }
-                            });*/
+                    uploadImage();
 
                     FirebaseUser usuarioFirebase = task.getResult().getUser();
+
+                    UserProfileChangeRequest profile = new UserProfileChangeRequest.Builder()
+                            .setDisplayName(usuarios.getNome())
+                            .setPhotoUri(Uri.parse(String.valueOf(uriFromPath)))
+                            .build();
+
+                    usuarioFirebase.updateProfile(profile)
+                            .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                @Override
+                                public void onComplete(@NonNull Task<Void> task) {
+
+                                }
+                            });
+
                     usuarios.setId(indentificadorUsuario);
                     usuarios.setPhotoPath("");
                     usuarios.salvar();
@@ -149,6 +153,44 @@ public class RegisterActivity extends Activity {
         });
     }
 
+
+    private void uploadImage() {
+        mStorageRef = FirebaseStorage.getInstance().getReference("profilepics"+System.currentTimeMillis()+".jpg");
+
+        if (uriFromPath != null) {
+            mStorageRef.putFile(uriFromPath)
+                    .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                        @Override
+                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                            //realPath = taskSnapshot.getDownloadUrl().toString();
+
+                        }
+                    })
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+
+                        }
+                    });
+        }
+
+        // Uri file = Uri.fromFile(new File(realPath));
+
+        //   String nameArq[] = file.toString().split("/");
+        //  final String nomeFile = nameArq[nameArq.length - 1].replace(".", "").replace("jpg","");
+
+ /*StorageReference photoRef = mStorageRef.child("imageUser/"+nomeFile);
+
+                    photoRef.putFile(file)
+                            .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                                @Override
+                                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                                    usuarios.setPhotoPath(taskSnapshot.getDownloadUrl().toString());
+                                }
+                            });*/
+    }
+
+
     public void abrirLoginUsuario() {
         Intent i = new Intent(RegisterActivity.this, LoginActivity.class);
         startActivity(i);
@@ -176,18 +218,25 @@ public class RegisterActivity extends Activity {
     protected void onActivityResult(int reqCode, int resCode, Intent data) {
         if(resCode == Activity.RESULT_OK && data != null){
 
+            uriFromPath = data.getData();
 
-            realPath = Util_Img.getRealPathFromURI_API19(this,
+            try {
+                Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), uriFromPath);
+                imbUploadImagem.setImageBitmap(bitmap);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            /*realPath = Util_Img.getRealPathFromURI_API19(this,
                     data.getData());
-            Uri uriFromPath = Uri.fromFile(new File(realPath));
+            uriFromPath = Uri.fromFile(new File(realPath));
             Bitmap bitmap = null;
             try {
                 bitmap = BitmapFactory.decodeStream(getContentResolver().openInputStream(uriFromPath));
+                imbUploadImagem.setImageBitmap(bitmap);
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
-            }
-//            imagemPerfil.setImageBitmap(bitmap);
-            imbUploadImagem.setImageBitmap(bitmap);
+            }*/
         }
     }
 
