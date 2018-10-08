@@ -128,7 +128,6 @@ public class RegisterActivity extends Activity {
                             });
 
                     usuarios.setId(indentificadorUsuario);
-                    usuarios.setPhotoPath("");
                     usuarios.salvar();
 
                     Preferencias  preferencias = new Preferencias(RegisterActivity.this);

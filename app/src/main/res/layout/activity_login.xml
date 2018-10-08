@@ -79,6 +79,7 @@
                 android:layout_height="wrap_content"
                 android:id="@+id/edtSenhaLogin"
                 android:hint="Digite sua Senha:"
+                android:inputType="textPassword"
                 android:layout_marginTop="10dp"/>
         </LinearLayout>
 

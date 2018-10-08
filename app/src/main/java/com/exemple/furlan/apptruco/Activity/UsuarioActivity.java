@@ -97,24 +97,10 @@ public class UsuarioActivity extends Activity {
 
                     String indentificadorUsuario = Base64Custom.codificarBase64(usuarios.getEmail());
 
-                    /*Uri file = Uri.fromFile(new File(realPath));
-
-                    String nameArq[] = file.toString().split("/");
-                    final String nomeFile = nameArq[nameArq.length - 1].replace(".", "").replace("jpg","");
-
-                    StorageReference photoRef = ConfiguracaoFirebase.getStorage().child("imageUser/"+nomeFile);
-
-                    photoRef.putFile(file)
-                            .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                                @Override
-                                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                                    usuarios.setPhotoPath(taskSnapshot.getDownloadUrl().toString());
-                                }
-                            });*/
-
                     FirebaseUser usuarioFirebase = task.getResult().getUser();
+
+
                     usuarios.setId(indentificadorUsuario);
-                    usuarios.setPhotoPath("");
                     usuarios.salvar();
 
                     Preferencias preferencias = new Preferencias(UsuarioActivity.this);

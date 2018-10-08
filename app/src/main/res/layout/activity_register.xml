@@ -34,11 +34,13 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/edtSenhaRegistro"
+            android:inputType="textPassword"
             android:hint="Senha:"/>
         <EditText
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/edtConfirmaSenhaRegistro"
+            android:inputType="textPassword"
             android:hint="Confirme Senha:"/>
         <EditText
             android:layout_width="match_parent"

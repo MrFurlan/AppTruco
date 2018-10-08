@@ -13,7 +13,6 @@ public class Usuarios {
     private String senha;
     private String nome;
     private String sobreNome;
-    private String photoPath;
 
     public Usuarios() {
     }
@@ -58,11 +57,6 @@ public class Usuarios {
         this.sobreNome = sobrenome;
     }
 
-    public String getPhotoPath() { return photoPath; }
-
-    public void setPhotoPath(String photoPath) { this.photoPath = photoPath; }
-
-
     public void salvar() {
         DatabaseReference referenciaFirebase = ConfiguracaoFirebase.getFirebase();
         referenciaFirebase.child("usuario").child(String.valueOf(getId())).setValue(this);
@@ -77,7 +71,6 @@ public class Usuarios {
         hashMapUsuario.put("senha", getSenha());
         hashMapUsuario.put("nome", getNome());
         hashMapUsuario.put("sobreNome", getSobrenome());
-        hashMapUsuario.put("photoPath", getPhotoPath());
 
         return hashMapUsuario;
     }
