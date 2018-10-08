@@ -106,8 +106,6 @@ public class RegisterActivity extends Activity {
 
                     String indentificadorUsuario = Base64Custom.codificarBase64(usuarios.getEmail());
 
-                    uploadImage();
-
                     FirebaseUser usuarioFirebase = task.getResult().getUser();
 
                     UserProfileChangeRequest profile = new UserProfileChangeRequest.Builder()
@@ -120,6 +118,12 @@ public class RegisterActivity extends Activity {
                                 @Override
                                 public void onComplete(@NonNull Task<Void> task) {
 
+                                }
+                            })
+                            .addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception e) {
+                                    String tt = "";
                                 }
                             });
 
@@ -152,44 +156,6 @@ public class RegisterActivity extends Activity {
             }
         });
     }
-
-
-    private void uploadImage() {
-        mStorageRef = FirebaseStorage.getInstance().getReference("profilepics"+System.currentTimeMillis()+".jpg");
-
-        if (uriFromPath != null) {
-            mStorageRef.putFile(uriFromPath)
-                    .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                        @Override
-                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                            //realPath = taskSnapshot.getDownloadUrl().toString();
-
-                        }
-                    })
-                    .addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception e) {
-
-                        }
-                    });
-        }
-
-        // Uri file = Uri.fromFile(new File(realPath));
-
-        //   String nameArq[] = file.toString().split("/");
-        //  final String nomeFile = nameArq[nameArq.length - 1].replace(".", "").replace("jpg","");
-
- /*StorageReference photoRef = mStorageRef.child("imageUser/"+nomeFile);
-
-                    photoRef.putFile(file)
-                            .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                                @Override
-                                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                                    usuarios.setPhotoPath(taskSnapshot.getDownloadUrl().toString());
-                                }
-                            });*/
-    }
-
 
     public void abrirLoginUsuario() {
         Intent i = new Intent(RegisterActivity.this, LoginActivity.class);
@@ -226,17 +192,6 @@ public class RegisterActivity extends Activity {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-
-            /*realPath = Util_Img.getRealPathFromURI_API19(this,
-                    data.getData());
-            uriFromPath = Uri.fromFile(new File(realPath));
-            Bitmap bitmap = null;
-            try {
-                bitmap = BitmapFactory.decodeStream(getContentResolver().openInputStream(uriFromPath));
-                imbUploadImagem.setImageBitmap(bitmap);
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-            }*/
         }
     }
 
@@ -263,6 +218,5 @@ public class RegisterActivity extends Activity {
         }else{
             ActivityCompat.requestPermissions(RegisterActivity.this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE);
         }
-
     }
 }
