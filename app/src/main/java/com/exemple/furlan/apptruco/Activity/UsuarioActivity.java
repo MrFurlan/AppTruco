@@ -95,16 +95,10 @@ public class UsuarioActivity extends Activity {
                 if (task.isSuccessful()) {
                     Toast.makeText(UsuarioActivity.this, "Usuário cadastrado com sucesso!", Toast.LENGTH_SHORT).show();
 
-                    String indentificadorUsuario = Base64Custom.codificarBase64(usuarios.getEmail());
-
-                    FirebaseUser usuarioFirebase = task.getResult().getUser();
-
-
-                    usuarios.setId(indentificadorUsuario);
-                    usuarios.salvar();
+                    usuarios.salvar(task.getResult().getUser().getUid());
 
                     Preferencias preferencias = new Preferencias(UsuarioActivity.this);
-                    preferencias.salvarUsuarioPreferencias(indentificadorUsuario, usuarios.getNome());
+                    preferencias.salvarUsuarioPreferencias(task.getResult().getUser().getUid(), usuarios.getNome());
 
                     abrirLoginUsuario();
                 } else {

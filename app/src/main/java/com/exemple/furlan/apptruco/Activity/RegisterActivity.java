@@ -104,16 +104,12 @@ public class RegisterActivity extends Activity {
                 if (task.isSuccessful()) {
                     Toast.makeText(RegisterActivity.this, "Usuário cadastrado com sucesso!", Toast.LENGTH_SHORT).show();
 
-                    String indentificadorUsuario = Base64Custom.codificarBase64(usuarios.getEmail());
-
-                    FirebaseUser usuarioFirebase = task.getResult().getUser();
-
                     UserProfileChangeRequest profile = new UserProfileChangeRequest.Builder()
                             .setDisplayName(usuarios.getNome())
                             .setPhotoUri(Uri.parse(String.valueOf(uriFromPath)))
                             .build();
 
-                    usuarioFirebase.updateProfile(profile)
+                    task.getResult().getUser().updateProfile(profile)
                             .addOnCompleteListener(new OnCompleteListener<Void>() {
                                 @Override
                                 public void onComplete(@NonNull Task<Void> task) {
@@ -123,15 +119,14 @@ public class RegisterActivity extends Activity {
                             .addOnFailureListener(new OnFailureListener() {
                                 @Override
                                 public void onFailure(@NonNull Exception e) {
-                                    String tt = "";
+
                                 }
                             });
 
-                    usuarios.setId(indentificadorUsuario);
-                    usuarios.salvar();
+                    usuarios.salvar(task.getResult().getUser().getUid());
 
                     Preferencias  preferencias = new Preferencias(RegisterActivity.this);
-                    preferencias.salvarUsuarioPreferencias(indentificadorUsuario, usuarios.getNome());
+                    preferencias.salvarUsuarioPreferencias(task.getResult().getUser().getUid(), usuarios.getNome());
 
                     abrirLoginUsuario();
                 } else {

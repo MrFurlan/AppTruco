@@ -8,21 +8,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Usuarios {
-    private String id;
     private String email;
     private String senha;
     private String nome;
     private String sobreNome;
 
     public Usuarios() {
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
     }
 
     public String getEmail() {
@@ -57,16 +48,15 @@ public class Usuarios {
         this.sobreNome = sobrenome;
     }
 
-    public void salvar() {
+    public void salvar(String idUsuario) {
         DatabaseReference referenciaFirebase = ConfiguracaoFirebase.getFirebase();
-        referenciaFirebase.child("usuario").child(String.valueOf(getId())).setValue(this);
+        referenciaFirebase.child("usuario").child(idUsuario).setValue(this);
     }
 
     @Exclude
     public Map<String, Object> toMap() {
         HashMap<String, Object> hashMapUsuario = new HashMap<>();
 
-        hashMapUsuario.put("id", getId());
         hashMapUsuario.put("email", getEmail());
         hashMapUsuario.put("senha", getSenha());
         hashMapUsuario.put("nome", getNome());

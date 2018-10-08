@@ -37,6 +37,8 @@ public class PlayersActivity extends Activity {
         mDatabaseRef = ConfiguracaoFirebase.getFirebase();
         autenticacao = ConfiguracaoFirebase.getFirebaseAutenticacao();
 
+
+
         nomeDupla.setText(autenticacao.getCurrentUser().getEmail());
     }
 
