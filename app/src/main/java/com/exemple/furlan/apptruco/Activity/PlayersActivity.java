@@ -39,17 +39,7 @@ public class PlayersActivity extends Activity {
 
 
 
-        nomeDupla.setText(autenticacao.getCurrentUser().getEmail());
-    }
-
-    public void GoToHome(View view) {
-        Intent i = new Intent(this,HomeActivity.class);
-        startActivity(i);
-    }
-
-    public void GoToLogin(View view) {
-        Intent i = new Intent(this,HomeActivity.class);
-        startActivity(i);
+        nomeDupla.setText(autenticacao.getCurrentUser().getDisplayName());
     }
 
     public void SalvarResultado(View view){
@@ -71,6 +61,9 @@ public class PlayersActivity extends Activity {
                 @Override
                 public void onSuccess(Void aVoid) {
                     Toast.makeText(PlayersActivity.this, "Jogo salvo com sucesso!", Toast.LENGTH_SHORT).show();
+                    Intent i = new Intent(PlayersActivity.this, HomeActivity.class);
+                    startActivity(i);
+                    finish();
                 }
             }).addOnFailureListener(new OnFailureListener() {
                 @Override
@@ -84,4 +77,16 @@ public class PlayersActivity extends Activity {
             });
         }
     }
+
+    public void GoToHome(View view) {
+        Intent i = new Intent(this,HomeActivity.class);
+        startActivity(i);
+    }
+
+    public void GoToLogin(View view) {
+        Intent i = new Intent(this,HomeActivity.class);
+        startActivity(i);
+    }
+
+
 }

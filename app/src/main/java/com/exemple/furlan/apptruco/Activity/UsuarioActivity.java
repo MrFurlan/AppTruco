@@ -190,4 +190,9 @@ public class UsuarioActivity extends Activity {
         }
 
     }
+
+    public void GoToHome(View view) {
+        Intent i = new Intent(this,HomeActivity.class);
+        startActivity(i);
+    }
 }
