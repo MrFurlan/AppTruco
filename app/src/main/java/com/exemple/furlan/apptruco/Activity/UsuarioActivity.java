@@ -10,6 +10,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -33,14 +34,19 @@ import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
 import com.google.firebase.auth.FirebaseAuthUserCollisionException;
 import com.google.firebase.auth.FirebaseAuthWeakPasswordException;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.ValueEventListener;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 
 public class UsuarioActivity extends Activity {
     final int MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE = 99;
     private ImageButton imbUploadImagem;
-    String realPath;
+    private Uri uriFromPath;
 
     private EditText edtNome;
     private EditText edtSobrenome;
@@ -50,20 +56,45 @@ public class UsuarioActivity extends Activity {
     private Button btnGravar;
     private Usuarios usuarios;
     private FirebaseAuth autenticacao;
+    private DatabaseReference dadosUsuario;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_usuario);
 
-        imbUploadImagem = findViewById(R.id.imb_registro_uploadImage);
+        imbUploadImagem = findViewById(R.id.img_usuario_uploadImage);
 
-        edtNome = (EditText) findViewById(R.id.edtNomeRegistro);
-        edtSobrenome = (EditText) findViewById(R.id.edtSobrenomeRegistro);
-        edtSenha = (EditText) findViewById(R.id.edtSenhaRegistro);
-        edtConfirmaSennha = (EditText) findViewById(R.id.edtConfirmaSenhaRegistro);
-        edtEmail = (EditText) findViewById(R.id.edtEmailRegistro);
+        edtNome = (EditText) findViewById(R.id.edtNomeUsuario);
+        edtSobrenome = (EditText) findViewById(R.id.edtSobrenomeUsuario);
+        edtSenha = (EditText) findViewById(R.id.edtSenhaUsuario);
+        edtConfirmaSennha = (EditText) findViewById(R.id.edtConfirmaSenhaUsuario);
+        edtEmail = (EditText) findViewById(R.id.edtEmailUsuario);
         btnGravar = (Button) findViewById(R.id.btnGravarUsuario);
+
+        autenticacao = ConfiguracaoFirebase.getFirebaseAutenticacao();
+
+        dadosUsuario = ConfiguracaoFirebase.getFirebase();
+        dadosUsuario = dadosUsuario.child("usuario").child(autenticacao.getCurrentUser().getUid());
+        imbUploadImagem.setImageURI(autenticacao.getCurrentUser().getPhotoUrl());
+        dadosUsuario.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                Usuarios user =  dataSnapshot.getValue(Usuarios.class);
+
+                edtNome.setText(user.getNome());
+                edtSobrenome.setText(user.getSobrenome());
+                edtSenha.setText(user.getSenha());
+                edtConfirmaSennha.setText(user.getSenha());
+                edtEmail.setText(user.getEmail());
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
 
         btnGravar.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -75,7 +106,7 @@ public class UsuarioActivity extends Activity {
                     usuarios.setNome(edtNome.getText().toString());
                     usuarios.setSobrenome(edtSobrenome.getText().toString());
 
-                    cadastrarUsuario();
+                    atualizarUsuario();
                 } else {
                     Toast.makeText(UsuarioActivity.this, "As senhas estão diferentes!", Toast.LENGTH_LONG).show();
                 }
@@ -84,7 +115,7 @@ public class UsuarioActivity extends Activity {
 
     }
 
-    private void cadastrarUsuario() {
+    private void atualizarUsuario() {
         autenticacao = ConfiguracaoFirebase.getFirebaseAutenticacao();
         autenticacao.createUserWithEmailAndPassword(
                 usuarios.getEmail(),
@@ -150,18 +181,14 @@ public class UsuarioActivity extends Activity {
     protected void onActivityResult(int reqCode, int resCode, Intent data) {
         if(resCode == Activity.RESULT_OK && data != null){
 
+            uriFromPath = data.getData();
 
-            realPath = Util_Img.getRealPathFromURI_API19(this,
-                    data.getData());
-            Uri uriFromPath = Uri.fromFile(new File(realPath));
-            Bitmap bitmap = null;
             try {
-                bitmap = BitmapFactory.decodeStream(getContentResolver().openInputStream(uriFromPath));
-            } catch (FileNotFoundException e) {
+                Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), uriFromPath);
+                imbUploadImagem.setImageBitmap(bitmap);
+            } catch (IOException e) {
                 e.printStackTrace();
             }
-//            imagemPerfil.setImageBitmap(bitmap);
-            imbUploadImagem.setImageBitmap(bitmap);
         }
     }
 

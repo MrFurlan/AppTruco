@@ -48,7 +48,6 @@ import java.io.IOException;
 public class RegisterActivity extends Activity {
     final int MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE = 99;
     private ImageButton imbUploadImagem;
-    private String realPath;
     private Uri uriFromPath;
 
     private EditText edtNome;

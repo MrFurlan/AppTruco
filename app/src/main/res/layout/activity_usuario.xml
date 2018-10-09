@@ -38,7 +38,7 @@
         <EditText
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/edtConfirmaSenhaRegistro"
+            android:id="@+id/edtConfirmaSenhaUsuario"
             android:hint="Confirme Senha:"/>
         <EditText
             android:layout_width="match_parent"
@@ -63,7 +63,7 @@
             android:text="Adiocionar Imagem:"/>
 
         <ImageButton
-            android:id="@+id/imb_usuario_uploadImage"
+            android:id="@+id/img_usuario_uploadImage"
             android:layout_width="130dp"
             android:layout_height="130dp"
             android:layout_gravity="center"
